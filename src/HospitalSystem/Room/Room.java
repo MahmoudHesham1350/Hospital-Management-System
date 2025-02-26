@@ -9,15 +9,18 @@ public class Room {
     private int pricePerDay;
     private boolean isAllocated;
 
-    public Room(int room_number, String roomDescription, int pricePerDay) {
-        if (roomNumbers.contains(room_number)) {
+    public Room(int roomNumber, String roomDescription, int pricePerDay) {
+        if (roomNumbers == null) {
+            roomNumbers = new java.util.HashSet<>();
+        }
+        if (roomNumbers.contains(roomNumber)) {
             throw new IllegalArgumentException("Room number already exists");
         }
-        this.roomNumber = room_number;
+        this.roomNumber = roomNumber;
         this.roomDescription = roomDescription;
         this.pricePerDay = pricePerDay;
         this.isAllocated = false;
-        roomNumbers.add(room_number);
+        roomNumbers.add(roomNumber);
     }
 
     @Override
