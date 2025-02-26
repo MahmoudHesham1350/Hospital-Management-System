@@ -2,7 +2,9 @@
 
 ## Project Overview
 
-This Hospital Management System is a Java-based console application designed to manage various aspects of hospital operations. The system provides different interfaces for different staff roles and allows for management of patients, rooms, records, and staff scheduling.
+This Hospital Management System is a Java-based console application designed to manage various aspects of hospital operations.<br>
+The system provides different interfaces for different staff roles and allows for management of
+- patients, rooms, patientRecords, and staff scheduling.
 
 ## System Architecture
 
@@ -24,7 +26,7 @@ The application follows an object-oriented design approach with the following ke
 - **Management**: Administrative staff with different management roles.
 
 ### Patient Management
-- **Patient**: Stores patient information and medical records.
+- **Patient**: Stores patient information and medical patientRecords.
 - **Record**: Contains medical diagnosis, prescriptions, and notes.
 
 ### Room Management
@@ -56,7 +58,7 @@ The application follows an object-oriented design approach with the following ke
 
 ### For Doctor
 - View patients
-- Create and manage patient medical records
+- Create and manage patient medical patientRecords
 
 ### For Management
 Based on role (General Manager, HR Manager, CEO):

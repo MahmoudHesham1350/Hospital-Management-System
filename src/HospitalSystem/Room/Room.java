@@ -53,14 +53,14 @@ public class Room {
     }
 
     public String getRoomDetails() {
-        return  "HospitalSystem.Labs.Room.Room{ \nnumber: " + roomNumber + "\n" +
-                "HospitalSystem.Labs.Room.Room description: " + roomDescription + "\n" +
+        return  "Room { \nnumber: " + roomNumber + "\n" +
+                "Room description: " + roomDescription + "\n" +
                 "Price per day: " + pricePerDay + "\n" +
                 "}";
     }
 
     @Override
     public String toString() {
-        return "HospitalSystem.Labs.Room.Room number: " + roomNumber;
+        return "Room number: " + roomNumber;
     }
 }

@@ -209,26 +209,17 @@ public class CLI {
             System.out.println("5. Return to Main Menu");
             int choice = getChoice(5);
             switch (choice) {
-                case 1:
-                    addTask(schedule);
-                    break;
-                case 2:
-                    removeTask(schedule);
-                    break;
-                case 3:
-                    clearDaySchedule(schedule);
-                    break;
-                case 4:
+                case 1 -> addTask(schedule);
+                case 2 -> removeTask(schedule);
+                case 3 -> clearDaySchedule(schedule);
+                case 4 -> {
                     schedule.clearSchedule();
                     System.out.println("Schedule cleared");
-                    break;
-                case 5:
-                    return;
-                default:
-                    throw new IllegalArgumentException(
-                            "Error at" + CLI.class.getName()
-                                    + "scheduleMenu() got invalid choice" + choice
-                    );
+                }
+                case 5 -> {return;}
+                default -> throw new IllegalArgumentException(
+                        "Error at " + CLI.class.getName() + " scheduleMenu() got invalid choice " + choice
+                );
             }
         }
     }
@@ -422,8 +413,7 @@ public class CLI {
     }
 
     // ================================================================================================================
-    // Patient Record Methods
-    
+
     private static void viewAllRecords(Patient patient) {
         List<PatientRecord> records = patient.getRecords();
         if (records.isEmpty()) {
@@ -484,8 +474,7 @@ public class CLI {
     }
 
     // ================================================================================================================
-    // Staff Management Methods
-    
+
     private static Doctor.SPECIALIZATION getDoctorSpecialization() {
         System.out.println("Enter Doctor Specialization: ");
         displayEnumOptions(Doctor.SPECIALIZATION.values());
@@ -502,15 +491,23 @@ public class CLI {
         System.out.println("Select Management Role:");
         System.out.println("1. General Manager");
         System.out.println("2. HR Manager");
-        System.out.println("3. CEO");
-        
-        int choice = getChoice(3);
-        return switch (choice) {
-            case 1 -> "GENERAL";
-            case 2 -> "HR";
-            case 3 -> "CEO";
-            default -> throw new IllegalArgumentException("Invalid choice");
-        };
+        if (user instanceof Admin) {
+            System.out.println("3. CEO");
+            int choice = getChoice(3);
+            return switch (choice) {
+                case 1 -> "GENERAL";
+                case 2 -> "HR";
+                case 3 -> "CEO";
+                default -> throw new IllegalArgumentException("Invalid choice");
+            };
+        } else {
+            int choice = getChoice(2);
+            return switch (choice) {
+                case 1 -> "GENERAL";
+                case 2 -> "HR";
+                default -> throw new IllegalArgumentException("Invalid choice");
+            };
+        }
     }
     
     private static void addManagementStaff() {
@@ -593,9 +590,6 @@ public class CLI {
             System.out.println("Invalid salary");
             return;
         }
-        System.out.println("Enter Staff Department: ");
-        String department = scanner.nextLine().trim();
-        
         System.out.println("Enter Staff Type (Receptionist/Nurse/Doctor/Management): ");
         String type = scanner.nextLine().trim().toLowerCase(); // Convert to lowercase
         
@@ -658,47 +652,17 @@ public class CLI {
             int choice = receptionistMenu();
             try {
                 switch (choice) {
-                    case 1: {
-                        scheduleMenu();
-                        break;
-                    }
-                    case 2: {
-                        createPatient();
-                        break;
-                    }
-                    case 3: {
-                        viewPatients();
-                        break;
-                    }
-                    case 4: {
-                        dischargePatient();
-                        break;
-                    }
-                    case 5: {
-                        viewRooms();
-                        break;
-                    }
-                    case 6: {
-                        viewAllocatedRooms();
-                        break;
-                    }
-                    case 7: {
-                        allocateRoom();
-                        break;
-                    }
-                    case 8: {
-                        dischargeRoom();
-                        break;
-                    }
-                    case 9: {
-                        createInvoice();
-                        break;
-                    }
-                    case 10: {
-                        return;
-                    }
-                    default:
-                        throw new IllegalArgumentException("Error at" + CLI.class.getName() + "receptionistMenu() got invalid choice" + choice);
+                    case 1 -> scheduleMenu();
+                    case 2 -> createPatient();
+                    case 3 -> viewPatients();
+                    case 4 -> dischargePatient();
+                    case 5 -> viewRooms();
+                    case 6 -> viewAllocatedRooms();
+                    case 7 -> allocateRoom();
+                    case 8 -> dischargeRoom();
+                    case 9 -> createInvoice();
+                    case 10 -> { return; }
+                    default -> throw new IllegalArgumentException("Error at" + CLI.class.getName() + "receptionistMenu() got invalid choice" + choice);
                 }
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
@@ -711,27 +675,12 @@ public class CLI {
             int choice = nurseMenu();
             try {
                 switch (choice) {
-                    case 1: {
-                        scheduleMenu();
-                        break;
-                    }
-                    case 2: {
-                        viewPatients();
-                        break;
-                    }
-                    case 3: {
-                        System.out.println(getPatient().getInfo());
-                        break;
-                    }
-                    case 4: {
-                        viewAllocatedRooms();
-                        break;
-                    }
-                    case 5: {
-                        return;
-                    }
-                    default:
-                        throw new IllegalArgumentException("Error at" + CLI.class.getName() + "nurseMenu() got invalid choice" + choice);
+                    case 1 -> scheduleMenu();
+                    case 2 -> viewPatients();
+                    case 3 -> System.out.println(getPatient().getInfo());
+                    case 4 -> viewAllocatedRooms();
+                    case 5 -> { return; }
+                    default -> throw new IllegalArgumentException("Error at" + CLI.class.getName() + "nurseMenu() got invalid choice" + choice);
                 }
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
@@ -842,22 +791,12 @@ public class CLI {
             System.out.println("5. Exit");
             int choice = getChoice(5);
             switch (choice) {
-                case 1:
-                    viewStaff();
-                    break;
-                case 2:
-                    addStaff();
-                    break;
-                case 3:
-                    removeStaff();
-                    break;
-                case 4:
-                    addManagementStaff();
-                    break;
-                case 5:
-                    return;
-                default:
-                    throw new IllegalArgumentException("Error at" + CLI.class.getName() + "adminMenu() got invalid choice" + choice);
+                case 1 -> viewStaff();
+                case 2 -> addStaff();
+                case 3 -> removeStaff();
+                case 4 -> addManagementStaff();
+                case 5 -> { return; }
+                default -> throw new IllegalArgumentException("Error at" + CLI.class.getName() + "adminMenu() got invalid choice" + choice);
             }
         }
     }

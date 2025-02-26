@@ -54,7 +54,7 @@ public class PatientRecord {
             testsString = testsString.substring(0, testsString.length() - 1);
         }
         
-        return "HospitalSystem.Patient.Record{\n" + "Date: " + date + "\n" +
+        return "Record{\n" + "Date: " + date + "\n" +
                 "Diagnosis: " + diagnosis + "\n" +
                 "Prescription: " + prescription + "\n" +
                 "Notes: " + notes + "\n" +

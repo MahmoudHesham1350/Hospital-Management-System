@@ -32,7 +32,7 @@ class Expenses {
 
     @Override
     public String toString() {
-        StringBuilder sb = new StringBuilder("HospitalSystem.Labs.Room.Expenses{");
+        StringBuilder sb = new StringBuilder("Expenses{");
         for (Pair expense : expenses) {
             sb.append(expense.key).append(": ").append(expense.Value).append("\n");
         }

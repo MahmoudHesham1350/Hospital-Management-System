@@ -39,7 +39,7 @@ public class RoomAllocation {
 
     @Override
     public String toString() {
-        return  "HospitalSystem.Labs.Room.Room Allocation{" + "Allocation ID: " + allocationId + "\n" +
+        return  "Room Allocation{" + "Allocation ID: " + allocationId + "\n" +
                 room + "\n" +
                 patient + "\n" +
                 "Start date: " + startDate + "\n" +
