@@ -1,6 +1,7 @@
 package HospitalSystem.Patient;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,7 +11,7 @@ public class Patient {
     private int contact_info;
     private String address;
     private int age;
-    private Map<LocalDate, Record> records;
+    private final Map<LocalDate, PatientRecord> records = new java.util.HashMap<>();
 
     public Patient(int ssn, String name, int contact_info, String address, int age) {
         this.ssn = ssn;
@@ -22,20 +23,31 @@ public class Patient {
 
     @Override
     public String toString() {
-        return "Name: " + name + "\n";
+        return "Name: " + name + "\nSSN: " + ssn + "\n";
     }
 
-    public void addRecord(Record record) {
-        records.put(record.getDate(), record);
+    public String getInfo() {
+        return "Name: " + name + "\nSSN: " + ssn + "\nContact Info: " + contact_info + "\nAddress: " + address + "\nAge: " + age + "\n";
     }
 
-    public Record getRecord(LocalDate date) {
+    public void addRecord(PatientRecord patientRecord) {
+        if (records.containsKey(patientRecord.getDate())) {
+            throw new IllegalArgumentException("Record already exists for this date");
+        }
+        records.put(patientRecord.getDate(), patientRecord);
+    }
+
+    public PatientRecord getRecord(LocalDate date) {
         return records.get(date);
     }
-
-    public List<Record> getRecords() {
-        return (List<Record>) records.values();
+    public List<PatientRecord> getRecords() {
+        List<PatientRecord> recordsList = new ArrayList<>();
+        for (PatientRecord record : records.values()) {
+            recordsList.add(record);
+        }
+        return recordsList;
     }
+    
     public boolean checkSSN(int ssn) {
         return ssn == this.ssn;
     }

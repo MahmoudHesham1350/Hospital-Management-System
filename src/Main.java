@@ -1,9 +1,9 @@
 import HospitalSystem.CLI;
 
-//TIP To <b>Run</b> code, press <shortcut actionId="Run"/> or
-// click the <icon src="AllIcons.Actions.Execute"/> icon in the gutter.
 public class Main {
     public static void main(String[] args) {
+        // DummyDataGenerator.generateDummyData(CLI.getHospital()); // uncomment this line to generate dummy data
         CLI.run();
-    }
-}
+    }  
+}       
+

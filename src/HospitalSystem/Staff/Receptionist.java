@@ -7,10 +7,22 @@ import java.util.List;
 public class Receptionist extends Staff {
     private final List<String> responsibilities;
 
+    public Receptionist(int ssid, String name, int contactInfo, String address, LocalDate hireDate, int salary) {
+        super(ssid, name, contactInfo, address, hireDate, salary);
+        this.responsibilities = new ArrayList<>();
+    }
+
     public Receptionist(int ssid, String name, int contactInfo, String address, LocalDate hireDate, int salary, List<String> responsibilities) {
         super(ssid, name, contactInfo, address, hireDate, salary);
         this.responsibilities = responsibilities != null ? responsibilities : new ArrayList<>();
     }
+
+    public Receptionist(int ssid, String name, int contactInfo, String address, LocalDate hireDate, int salary, Schedule schedule) {
+        super(ssid, name, contactInfo, address, hireDate, salary, schedule);
+        this.responsibilities = new ArrayList<>();
+    }
+
+
 
     public void addResponsibility(String responsibility) {
         this.responsibilities.add(responsibility);

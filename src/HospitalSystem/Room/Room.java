@@ -23,10 +23,10 @@ public class Room {
         roomNumbers.add(roomNumber);
     }
 
-    @Override
-    protected void finalize() {
+    public static void removeNumber(int roomNumber) {
         roomNumbers.remove(roomNumber);
     }
+
 
     public void updateRoomDescription(String roomDescription) {
         this.roomDescription = roomDescription;

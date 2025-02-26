@@ -1,13 +1,14 @@
 package HospitalSystem;
 import HospitalSystem.Mangement.Management;
 import HospitalSystem.Patient.Patient;
-import HospitalSystem.Patient.Record;
+import HospitalSystem.Patient.PatientRecord;
 import HospitalSystem.Room.Room;
 import HospitalSystem.Room.RoomAllocation;
 import HospitalSystem.Staff.*;
 import HospitalSystem.User.Admin;
 import HospitalSystem.User.User;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
@@ -16,6 +17,10 @@ public class CLI {
     private static User user;
     private final static Hospital hospital = new Hospital();
     private static Scanner scanner = new Scanner(System.in);
+
+    public static Hospital getHospital() {
+        return hospital;
+    }
 
     
     private static int getChoice(int range) {
@@ -88,19 +93,20 @@ public class CLI {
         }
     }
 
-    private static LocalDate getDate() {
-        System.out.println("Enter Record Date (yyyy-MM-dd): ");
-        String dateStr = scanner.nextLine();
-        try {
-            return LocalDate.parse(dateStr);
-        } catch (DateTimeParseException e) {
-            System.out.println("Invalid date format. Please use yyyy-MM-dd");
-            return getDate();
+        private static LocalDate getDate() {
+            System.out.println("Enter Record Date (yyyy-M-d): ");
+            String dateStr = scanner.nextLine().trim();
+            try {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-M-d");
+                return LocalDate.parse(dateStr, formatter);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please use yyyy-M-d");
+                return getDate();
+            }
         }
-    }
-    
-    private static void mainMenu() {
-        System.out.println("Welcome to the Hospital System");
+        
+        private static void mainMenu() {
+        System.out.println("===== Hospital System =====");
         System.out.println("1. Enter as an Admin");
         System.out.println("2. Enter as Staff Member");
         System.out.println("3. Exit");
@@ -418,9 +424,8 @@ public class CLI {
     // ================================================================================================================
     // Patient Record Methods
     
-    private static void viewAllRecords() {
-        Patient patient = getPatient();
-        List<Record> records = patient.getRecords();
+    private static void viewAllRecords(Patient patient) {
+        List<PatientRecord> records = patient.getRecords();
         if (records.isEmpty()) {
             System.out.println("No records found");
             return;
@@ -429,9 +434,8 @@ public class CLI {
         displayNumberedList(records);
     }
 
-    private static void viewRecord() {
-        Patient patient = getPatient();
-        Record record = patient.getRecord(getDate());
+    private static void viewRecord(Patient patient) {
+        PatientRecord record = patient.getRecord(getDate());
         if (record == null) {
             System.out.println("Record not found");
         } else {
@@ -439,8 +443,7 @@ public class CLI {
         }
     }
 
-    private static void addRecord() {
-        Patient patient = getPatient();
+    private static void addRecord(Patient patient) {
         System.out.println("Enter Diagnosis: ");
         String diagnosis = scanner.nextLine();
         System.out.println("Enter Prescription: ");
@@ -448,12 +451,13 @@ public class CLI {
         System.out.println("Enter Notes: ");
         String notes = scanner.nextLine();
         System.out.println("Enter Doctor SSN: ");
-        Record record = new Record(getDate(), diagnosis, prescription, notes, (Doctor) user, null);
+        PatientRecord record = new PatientRecord(getDate(), diagnosis, prescription, notes, (Doctor) user, null);
         patient.addRecord(record);
         System.out.println("Record added successfully");
     }
 
     private static void patientRecordsMenu() {
+        Patient patient = getPatient();
         System.out.println("1. Add Record");
         System.out.println("2. View Record");
         System.out.println("3. View All Records");
@@ -461,13 +465,13 @@ public class CLI {
         int choice = getChoice(4);
         switch (choice) {
             case 1:
-                addRecord();
+                addRecord(patient);
                 break;
             case 2:
-                viewRecord();
+                viewRecord(patient);
                 break;
             case 3:
-                viewAllRecords();
+                viewAllRecords(patient);
                 break;
             case 4:
                 return;
@@ -597,7 +601,7 @@ public class CLI {
         
         try {
             switch (type) {
-                case "receptionist" -> hospital.addStaff(new Receptionist(ssn, name, contact_info, address, LocalDate.now(), salary, null)); 
+                case "receptionist" -> hospital.addStaff(new Receptionist(ssn, name, contact_info, address, LocalDate.now(), salary)); 
                 case "nurse" -> hospital.addStaff(new Nurse(ssn, name, contact_info, address, LocalDate.now(), salary, "General Nurse")); 
                 case "doctor" -> hospital.addStaff(new Doctor(ssn, name, contact_info, address, LocalDate.now(), salary, getDoctorSpecialization(), null));
                 case "management" -> hospital.addStaff(new Management(ssn, name, contact_info, address, LocalDate.now(), salary, getManagementRole(), null));
@@ -642,13 +646,13 @@ public class CLI {
                 return;
             }
             hospital.removeRoom(room);
+            Room.removeNumber(roomNumber);
             System.out.println("Room deleted successfully");
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
     }
 
-    
     private static void receptionist() {
         while (true) {
             int choice = receptionistMenu();
@@ -716,7 +720,7 @@ public class CLI {
                         break;
                     }
                     case 3: {
-                        getPatient();
+                        System.out.println(getPatient().getInfo());
                         break;
                     }
                     case 4: {
@@ -742,7 +746,7 @@ public class CLI {
                 switch (choice) {
                     case 1 -> scheduleMenu();
                     case 2 -> viewPatients();
-                    case 3 -> getPatient();
+                    case 3 -> System.out.println(getPatient().getInfo());
                     case 4 -> patientRecordsMenu();
                     case 5 -> { return; }
                     default -> throw new IllegalArgumentException("Error at" + CLI.class.getName() + "doctorMenu() got invalid choice" + choice);
@@ -858,7 +862,6 @@ public class CLI {
         }
     }
 
-   
     public static void run() {
         while (true) {
             user = null;
