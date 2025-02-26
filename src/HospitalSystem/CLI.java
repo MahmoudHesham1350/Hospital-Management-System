@@ -7,20 +7,17 @@ import HospitalSystem.Room.RoomAllocation;
 import HospitalSystem.Staff.*;
 import HospitalSystem.User.Admin;
 import HospitalSystem.User.User;
-
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
-
-
 public class CLI {
     private static User user;
     private final static Hospital hospital = new Hospital();
-
     private static Scanner scanner = new Scanner(System.in);
 
+    
     private static int getChoice(int range) {
         while (true) {
             try {
@@ -30,6 +27,34 @@ public class CLI {
                     return choice;
                 }
                 System.out.println("Invalid choice. Please enter a number between 1 and " + range);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+
+    private static int getIntInput(String prompt, int min, int max) {
+        while (true) {
+            System.out.println(prompt);
+            try {
+                String input = scanner.nextLine().trim();
+                int value = Integer.parseInt(input);
+                if (value >= min && value <= max) {
+                    return value;
+                }
+                System.out.println("Please enter a number between " + min + " and " + max);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+            }
+        }
+    }
+    
+    private static int getIntInput(String prompt) {
+        while (true) {
+            System.out.println(prompt);
+            try {
+                String input = scanner.nextLine().trim();
+                return Integer.parseInt(input);
             } catch (NumberFormatException e) {
                 System.out.println("Invalid input. Please enter a number.");
             }
@@ -48,6 +73,32 @@ public class CLI {
         }
     }
 
+    private static int get_ssn() {
+        while (true) {
+            System.out.println("Enter SSN (9 digits): ");
+            try {
+                int ssn = Integer.parseInt(scanner.nextLine().trim());
+                if (ssn >= 100000000 && ssn <= 999999999) {
+                    return ssn;
+                }
+                System.out.println("SSN must be 9 digits. Please try again.");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a numeric SSN.");
+            }
+        }
+    }
+
+    private static LocalDate getDate() {
+        System.out.println("Enter Record Date (yyyy-MM-dd): ");
+        String dateStr = scanner.nextLine();
+        try {
+            return LocalDate.parse(dateStr);
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date format. Please use yyyy-MM-dd");
+            return getDate();
+        }
+    }
+    
     private static void mainMenu() {
         System.out.println("Welcome to the Hospital System");
         System.out.println("1. Enter as an Admin");
@@ -62,11 +113,11 @@ public class CLI {
         System.out.println("4. Discharge Patient");
         System.out.println("5. View Rooms");
         System.out.println("6. View Allocated Rooms");
-        System.out.println("6. Allocate Room");
-        System.out.println("7. Discharge Room");
-        System.out.println("8. Invoice");
-        System.out.println("9. Exit");
-        return getChoice(9);
+        System.out.println("7. Allocate Room");
+        System.out.println("8. Discharge Room");
+        System.out.println("9. Invoice");
+        System.out.println("10. Exit");
+        return getChoice(10);
     }
 
     private static int nurseMenu() {
@@ -114,7 +165,7 @@ public class CLI {
         System.out.println("3. Exit");
         return getChoice(3);
     }
-
+    
     private static void adminLogin() {
         System.out.println("Enter Username: ");
         String username = scanner.nextLine();
@@ -129,22 +180,6 @@ public class CLI {
         }
     }
 
-    private static int get_ssn() {
-        System.out.println("Enter SSN: ");
-        try {
-            int ssn = Integer.parseInt(scanner.nextLine());
-            if (ssn < 100000000 || ssn > 999999999) {
-                System.out.println("Invalid SSN. Please try again.");
-                return 0;
-            } else {
-                return ssn;
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid SSN. Please try again.");
-            return 0;
-        }
-    }
-
     private static void staffLogin() {
         System.out.println("Enter SSN: ");
         Staff staff = hospital.getStaff(get_ssn());
@@ -156,7 +191,7 @@ public class CLI {
             throw new IllegalArgumentException("Invalid Credentials");
         }
     }
-
+    
     private static void scheduleMenu() {
         while (true) {
             Schedule schedule = user.getSchedule();
@@ -182,7 +217,7 @@ public class CLI {
                     System.out.println("Schedule cleared");
                     break;
                 case 5:
-                    break;
+                    return;
                 default:
                     throw new IllegalArgumentException(
                             "Error at" + CLI.class.getName()
@@ -229,21 +264,48 @@ public class CLI {
         int dayChoice = getChoice(Schedule.Day.values().length);
         return Schedule.Day.values()[dayChoice - 1];
     }
-
+    
     private static void createPatient() {
         System.out.println("Enter Patient Name: ");
-        String name = scanner.nextLine();
-        System.out.println("Enter Patient SSN: ");
+        String name = scanner.nextLine().trim();
+        if (name.isEmpty()) {
+            System.out.println("Name cannot be empty");
+            return;
+        }
+        
         int ssn = get_ssn();
-        System.out.println("Enter Patient Contact Info: ");
-        int contact_info = Integer.parseInt(scanner.nextLine());
+        
+        int contact_info;
+        try {
+            contact_info = getIntInput("Enter Patient Contact Info: ");
+            if (contact_info <= 0) {
+                System.out.println("Contact info must be a positive number");
+                return;
+            }
+        } catch (Exception e) {
+            System.out.println("Invalid contact info");
+            return;
+        }
+        
         System.out.println("Enter Patient Address: ");
-        String address = scanner.nextLine();
-        System.out.println("Enter Patient Age: ");
-        int age = Integer.parseInt(scanner.nextLine());
+        String address = scanner.nextLine().trim();
+        if (address.isEmpty()) {
+            System.out.println("Address cannot be empty");
+            return;
+        }
+        
+        int age;
+        try {
+            age = getIntInput("Enter Patient Age: ", 0, 150);
+        } catch (Exception e) {
+            System.out.println("Invalid age");
+            return;
+        }
+        
         try {
             Patient patient = new Patient(ssn, name, contact_info, address, age);
             hospital.addPatient(patient);
+            System.out.println("Patient created successfully");
         } catch (IllegalArgumentException e) {
             System.out.println(e.getMessage());
         }
@@ -279,9 +341,15 @@ public class CLI {
         }
     }
 
+
     private static Room getRoom() {
-        System.out.println("Enter Room Number: ");
-        int roomNumber = Integer.parseInt(scanner.nextLine());
+        int roomNumber;
+        try {
+            roomNumber = getIntInput("Enter Room Number: ", 1, Integer.MAX_VALUE);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid room number");
+        }
+        
         Room room = hospital.getRoom(roomNumber);
         if (room == null) {
             throw new IllegalArgumentException("Room not found");
@@ -347,6 +415,240 @@ public class CLI {
         }
     }
 
+    // ================================================================================================================
+    // Patient Record Methods
+    
+    private static void viewAllRecords() {
+        Patient patient = getPatient();
+        List<Record> records = patient.getRecords();
+        if (records.isEmpty()) {
+            System.out.println("No records found");
+            return;
+        }
+        System.out.println("Records:");
+        displayNumberedList(records);
+    }
+
+    private static void viewRecord() {
+        Patient patient = getPatient();
+        Record record = patient.getRecord(getDate());
+        if (record == null) {
+            System.out.println("Record not found");
+        } else {
+            System.out.println(record);
+        }
+    }
+
+    private static void addRecord() {
+        Patient patient = getPatient();
+        System.out.println("Enter Diagnosis: ");
+        String diagnosis = scanner.nextLine();
+        System.out.println("Enter Prescription: ");
+        String prescription = scanner.nextLine();
+        System.out.println("Enter Notes: ");
+        String notes = scanner.nextLine();
+        System.out.println("Enter Doctor SSN: ");
+        Record record = new Record(getDate(), diagnosis, prescription, notes, (Doctor) user, null);
+        patient.addRecord(record);
+        System.out.println("Record added successfully");
+    }
+
+    private static void patientRecordsMenu() {
+        System.out.println("1. Add Record");
+        System.out.println("2. View Record");
+        System.out.println("3. View All Records");
+        System.out.println("4. Exit");
+        int choice = getChoice(4);
+        switch (choice) {
+            case 1:
+                addRecord();
+                break;
+            case 2:
+                viewRecord();
+                break;
+            case 3:
+                viewAllRecords();
+                break;
+            case 4:
+                return;
+            default:
+                throw new IllegalArgumentException(
+                        "Error at" + CLI.class.getName()
+                                + "patientRecordsMenu() got invalid choice" + choice
+                );
+        }
+    }
+
+    // ================================================================================================================
+    // Staff Management Methods
+    
+    private static Doctor.SPECIALIZATION getDoctorSpecialization() {
+        System.out.println("Enter Doctor Specialization: ");
+        displayEnumOptions(Doctor.SPECIALIZATION.values());
+        try {
+            int choice = getChoice(Doctor.SPECIALIZATION.values().length);
+            return Doctor.SPECIALIZATION.values()[choice - 1];
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+            return getDoctorSpecialization();
+        }
+    }
+    
+    private static String getManagementRole() {
+        System.out.println("Select Management Role:");
+        System.out.println("1. General Manager");
+        System.out.println("2. HR Manager");
+        System.out.println("3. CEO");
+        
+        int choice = getChoice(3);
+        return switch (choice) {
+            case 1 -> "GENERAL";
+            case 2 -> "HR";
+            case 3 -> "CEO";
+            default -> throw new IllegalArgumentException("Invalid choice");
+        };
+    }
+    
+    private static void addManagementStaff() {
+        System.out.println("Enter Staff Name: ");
+        String name = scanner.nextLine().trim();
+        if (name.isEmpty()) {
+            System.out.println("Name cannot be empty");
+            return;
+        }
+        
+        int ssn = get_ssn();
+        
+        int contactInfo;
+        try {
+            contactInfo = getIntInput("Enter Staff Contact Info: ");
+        } catch (Exception e) {
+            System.out.println("Invalid contact info");
+            return;
+        }
+        
+        System.out.println("Enter Staff Address: ");
+        String address = scanner.nextLine().trim();
+        
+        int salary;
+        try {
+            salary = getIntInput("Enter Staff Salary: ", 0, Integer.MAX_VALUE);
+        } catch (Exception e) {
+            System.out.println("Invalid salary");
+            return;
+        }
+        
+        String role = getManagementRole();
+        
+        try {
+            hospital.addStaff(new Management(ssn, name, contactInfo, address, LocalDate.now(), salary, role, null));
+            System.out.println("Management staff added successfully");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static void viewStaff() {
+        List<Staff> staff = hospital.getStaff();
+        if (staff.isEmpty()) {
+            System.out.println("No staff found");
+            return;
+        }
+        System.out.println("Staff:");
+        displayNumberedList(staff);
+    }
+
+    private static void addStaff() {
+        System.out.println("Enter Staff Name: ");
+        String name = scanner.nextLine().trim();
+        if (name.isEmpty()) {
+            System.out.println("Name cannot be empty");
+            return;
+        }
+        int ssn = get_ssn();
+        int contact_info;
+        try {
+            contact_info = getIntInput("Enter Staff Contact Info: ");
+        } catch (Exception e) {
+            System.out.println("Invalid contact info");
+            return;
+        }
+        System.out.println("Enter Staff Address: ");
+        String address = scanner.nextLine().trim();
+        int age;
+        try {
+            age = getIntInput("Enter Staff Age: ", 18, 100);
+        } catch (Exception e) {
+            System.out.println("Invalid age");
+            return;
+        }
+        int salary;
+        try {
+            salary = getIntInput("Enter Staff Salary: ", 0, Integer.MAX_VALUE);
+        } catch (Exception e) {
+            System.out.println("Invalid salary");
+            return;
+        }
+        System.out.println("Enter Staff Department: ");
+        String department = scanner.nextLine().trim();
+        
+        System.out.println("Enter Staff Type (Receptionist/Nurse/Doctor/Management): ");
+        String type = scanner.nextLine().trim().toLowerCase(); // Convert to lowercase
+        
+        try {
+            switch (type) {
+                case "receptionist" -> hospital.addStaff(new Receptionist(ssn, name, contact_info, address, LocalDate.now(), salary, null));
+                case "nurse" -> hospital.addStaff(new Nurse(ssn, name, contact_info, address, LocalDate.now(), salary, null));
+                case "doctor" -> hospital.addStaff(new Doctor(ssn, name, contact_info, address, LocalDate.now(), salary, getDoctorSpecialization(), null));
+                case "management" -> hospital.addStaff(new Management(ssn, name, contact_info, address, LocalDate.now(), salary, getManagementRole(), null));
+                default -> throw new IllegalArgumentException("Invalid Staff Type. Must be Receptionist, Nurse, Doctor, or Management.");
+            }
+            System.out.println("Staff added successfully");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static void removeStaff() {
+        try {
+            Staff staff = hospital.getStaff(get_ssn());
+            hospital.removeStaff(staff);
+            System.out.println("Staff deleted successfully");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static void addRoom() {
+        try {
+            int roomNumber = getIntInput("Enter Room Number: ", 1, Integer.MAX_VALUE);
+            System.out.println("Enter Room Description: ");
+            String description = scanner.nextLine().trim();
+            int price = getIntInput("Enter Room Price: ", 0, Integer.MAX_VALUE);
+            
+            hospital.addRoom(new Room(roomNumber, description, price));
+            System.out.println("Room added successfully");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private static void deleteRoom() {
+        try {
+            int roomNumber = getIntInput("Enter Room Number: ", 1, Integer.MAX_VALUE);
+            Room room = hospital.getRoom(roomNumber);
+            if (room == null) {
+                System.out.println("Room not found");
+                return;
+            }
+            hospital.removeRoom(room);
+            System.out.println("Room deleted successfully");
+        } catch (IllegalArgumentException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+
+    
     private static void receptionist() {
         while (true) {
             int choice = receptionistMenu();
@@ -433,78 +735,6 @@ public class CLI {
         }
     }
 
-    private static void viewAllRecords() {
-        Patient patient = getPatient();
-        List<Record> records = patient.getRecords();
-        if (records.isEmpty()) {
-            System.out.println("No records found");
-            return;
-        }
-        System.out.println("Records:");
-        displayNumberedList(records);
-    }
-
-    private static LocalDate getDate() {
-        System.out.println("Enter Record Date (yyyy-MM-dd): ");
-        String dateStr = scanner.nextLine();
-        try {
-            return LocalDate.parse(dateStr);
-        } catch (DateTimeParseException e) {
-            System.out.println("Invalid date format. Please use yyyy-MM-dd");
-            return getDate();
-        }
-    }
-
-    private static void viewRecord() {
-        Patient patient = getPatient();
-        Record record = patient.getRecord(getDate());
-        if (record == null) {
-            System.out.println("Record not found");
-        } else {
-            System.out.println(record);
-        }
-    }
-
-    private static void addRecord() {
-        Patient patient = getPatient();
-        System.out.println("Enter Diagnosis: ");
-        String diagnosis = scanner.nextLine();
-        System.out.println("Enter Prescription: ");
-        String prescription = scanner.nextLine();
-        System.out.println("Enter Notes: ");
-        String notes = scanner.nextLine();
-        System.out.println("Enter Doctor SSN: ");
-        Record record = new Record(getDate(), diagnosis, prescription, notes, (Doctor) user, null);
-        patient.addRecord(record);
-        System.out.println("Record added successfully");
-    }
-
-    private static void patientRecordsMenu() {
-        System.out.println("1. Add Record");
-        System.out.println("2. View Record");
-        System.out.println("3. View All Records");
-        System.out.println("4. Exit");
-        int choice = getChoice(4);
-        switch (choice) {
-            case 1:
-                addRecord();
-                break;
-            case 2:
-                viewRecord();
-                break;
-            case 3:
-                viewAllRecords();
-                break;
-            case 4:
-                return;
-            default:
-                throw new IllegalArgumentException(
-                        "Error at" + CLI.class.getName()
-                                + "patientRecordsMenu() got invalid choice" + choice
-                );
-        }
-    }
-
     private static void doctor() {
         while (true) {
             int choice = doctorMenu();
@@ -521,98 +751,6 @@ public class CLI {
                 System.out.println(e.getMessage());
             }
         }
-    }
-
-    private static Doctor.SPECIALIZATION getDoctorSpecialization() {
-        System.out.println("Enter Doctor Specialization: ");
-        displayEnumOptions(Doctor.SPECIALIZATION.values());
-        try {
-            int choice = getChoice(Doctor.SPECIALIZATION.values().length);
-            return Doctor.SPECIALIZATION.values()[choice - 1];
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-            return getDoctorSpecialization();
-        }
-
-    }
-
-    private static void viewStaff() {
-        List<Staff> staff = hospital.getStaff();
-        if (staff.isEmpty()) {
-            System.out.println("No staff found");
-            return;
-        }
-        System.out.println("Staff:");
-        displayNumberedList(staff);
-    }
-
-    private static void addStaff() {
-        System.out.println("Enter Staff Name: ");
-        String name = scanner.nextLine();
-        System.out.println("Enter Staff SSN: ");
-        int ssn = get_ssn();
-        System.out.println("Enter Staff Contact Info: ");
-        int contact_info = Integer.parseInt(scanner.nextLine());
-        System.out.println("Enter Staff Address: ");
-        String address = scanner.nextLine();
-        System.out.println("Enter Staff Age: ");
-        int age = Integer.parseInt(scanner.nextLine());
-        System.out.println("Enter Staff Salary: ");
-        int salary = Integer.parseInt(scanner.nextLine());
-        System.out.println("Enter Staff Department: ");
-        String department = scanner.nextLine();
-        System.out.println("Enter Staff Type: ");
-        String type = scanner.nextLine();
-        try {
-            switch (type) {
-                case "Receptionist" -> hospital.addStaff(new Receptionist(ssn, name, contact_info, address, LocalDate.now(), salary, null));
-                case "Nurse" -> hospital.addStaff(new Nurse(ssn, name, contact_info, address, LocalDate.now(), salary, null));
-                case "Doctor" -> hospital.addStaff(new Doctor(ssn, name, contact_info, address, LocalDate.now(), salary, getDoctorSpecialization(), null));
-                default -> throw new IllegalArgumentException("Invalid Staff Type");
-            }
-
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private static void removeStaff() {
-        try {
-            Staff staff = hospital.getStaff(get_ssn());
-            hospital.removeStaff(staff);
-            System.out.println("Staff deleted successfully");
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private static void addRoom() {
-        System.out.println("Enter Room Number: ");
-        int roomNumber = Integer.parseInt(scanner.nextLine());
-        System.out.println("Enter Room Description: ");
-        String Description = scanner.nextLine();
-        System.out.println("Enter Room Price: ");
-        int price = Integer.parseInt(scanner.nextLine());
-        try {
-            hospital.addRoom(new Room(roomNumber, Description, price));
-        } catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    private static void deleteRoom() {
-        try {
-            Room room = hospital.getRoom(Integer.parseInt(scanner.nextLine()));
-            hospital.removeRoom(room);
-            System.out.println("Room deleted successfully");
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid input Number. Please try again.");
-            deleteRoom();
-        }
-        catch (IllegalArgumentException e) {
-            System.out.println(e.getMessage());
-        }
-
     }
 
     private static void generalManager() {
@@ -671,38 +809,48 @@ public class CLI {
     }
 
     private static void staffMenu() {
-            switch (user.getClass().getSimpleName()) {
-                case "Receptionist" -> receptionist();
-                case "Nurse" -> nurse();
-                case "Doctor" -> doctor();
-                case "Management" -> {
-                    switch (((Management) user).getRole()) {
-                        case "GENERAL" -> generalManager();
-                        case "HR" -> hrManager();
-                        case "CEO" -> ceo();
-                        default -> throw new IllegalArgumentException("Invalid Role: " + ((Management) user).getRole());
-                    }
+        String staffType = user.getClass().getSimpleName();
+        
+        switch (staffType) {
+            case "Receptionist" -> receptionist();
+            case "Nurse" -> nurse();
+            case "Doctor" -> doctor();
+            case "Management" -> {
+                String role = ((Management) user).getRole().toUpperCase(); // Convert to uppercase
+                switch (role) {
+                    case "GENERAL" -> generalManager();
+                    case "HR" -> hrManager();
+                    case "CEO" -> ceo();
+                    default -> throw new IllegalArgumentException("Invalid Role: " + ((Management) user).getRole());
                 }
-                default -> throw new IllegalArgumentException("Invalid Staff Member: " + user.getClass().getSimpleName());
             }
+            default -> throw new IllegalArgumentException("Invalid Staff Member: " + staffType);
         }
+    }
 
     private static void adminMenu() {
         while (true){
-            System.out.println("Welcome Admin");
-            viewStaff();
-            System.out.println("1. Add Staff");
-            System.out.println("2. Delete Staff");
-            System.out.println("3. Exit");
-            int choice = getChoice(3);
+            System.out.println("\n===== Admin Menu =====");
+            System.out.println("1. View Staff");
+            System.out.println("2. Add Staff");
+            System.out.println("3. Delete Staff");
+            System.out.println("4. Add Management Staff");
+            System.out.println("5. Exit");
+            int choice = getChoice(5);
             switch (choice) {
                 case 1:
-                    addStaff();
+                    viewStaff();
                     break;
                 case 2:
-                    removeStaff();
+                    addStaff();
                     break;
                 case 3:
+                    removeStaff();
+                    break;
+                case 4:
+                    addManagementStaff();
+                    break;
+                case 5:
                     return;
                 default:
                     throw new IllegalArgumentException("Error at" + CLI.class.getName() + "adminMenu() got invalid choice" + choice);
@@ -710,30 +858,30 @@ public class CLI {
         }
     }
 
+   
     public static void run() {
         while (true) {
             user = null;
             mainMenu();
             int choice = getChoice(3);
             try {
-            switch (choice) {
-                case 1:
-                    adminLogin();
-                    adminMenu();
-                    break;
-                case 2:
-                    staffLogin();
-                    staffMenu();
-                    break;
-                case 3:
-                    System.exit(0);
-                default:
-                    System.out.println("Invalid choice. Please try again.");
-            }
+                switch (choice) {
+                    case 1:
+                        adminLogin();
+                        adminMenu();
+                        break;
+                    case 2:
+                        staffLogin();
+                        staffMenu();
+                        break;
+                    case 3:
+                        System.exit(0);
+                    default:
+                        System.out.println("Invalid choice. Please try again.");
+                }
             } catch (IllegalArgumentException e) {
                 System.out.println(e.getMessage());
             }
         }
     }
 }
-

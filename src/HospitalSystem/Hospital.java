@@ -1,13 +1,12 @@
 package HospitalSystem;
 
-import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-
 import HospitalSystem.Patient.Patient;
 import HospitalSystem.Room.Room;
 import HospitalSystem.Room.RoomAllocation;
 import HospitalSystem.Staff.Staff;
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Hospital {
     private String name = "Hospital";
@@ -25,17 +24,34 @@ public class Hospital {
         this.invoices = new ArrayList<>();
     }
 
-
+    // ================================================================================================================
     public void addStaff(Staff staff) {
         this.staff.add(staff);
     }
 
-    public void addPatient(Patient patient) {
-        this.patients.add(patient);
-    }
-
     public List<Staff> getStaff() {
         return this.staff;
+    }
+
+    public Staff getStaff(int ssn) {
+        for (Staff staff : this.staff) {
+            if (staff.checkSSN(ssn)) {
+                return staff;
+            }
+        }
+        return null;
+    }
+
+    public void removeStaff(Staff staff) {
+        if (!this.staff.contains(staff)) {
+            throw new IllegalArgumentException("Staff not found");
+        }
+        this.staff.remove(staff);
+    }
+
+    // ================================================================================================================
+    public void addPatient(Patient patient) {
+        this.patients.add(patient);
     }
 
     public Patient getPatient(int ssn) {
@@ -55,23 +71,7 @@ public class Hospital {
         this.patients.remove(patient);
     }
 
-    public Staff getStaff(int ssn) {
-
-        for (Staff staff : this.staff) {
-            if (staff.checkSSN(ssn)) {
-                return staff;
-            }
-        }
-        return null;
-    }
-
-public void removeStaff(Staff staff) {
-    if (!this.staff.contains(staff)) {
-        throw new IllegalArgumentException("Staff not found");
-    }
-    this.staff.remove(staff);
-}
-
+    // Room Methods
     public void addRoom(Room room) {
         this.rooms.add(room);
     }
@@ -93,14 +93,7 @@ public void removeStaff(Staff staff) {
         this.rooms.remove(room);
     }
 
-    public List<Room> getAllocatedRooms() {
-        List<Room> allocatedRooms = new ArrayList<>();
-        for (RoomAllocation roomAllocation : this.roomAllocations) {
-            allocatedRooms.add(roomAllocation.getRoom());
-        }
-        return allocatedRooms;
-    }
-
+    // ================================================================================================================
     public void allocateRoom(Patient patient, Room room) {
         if (room.getAllocationStatus()) {
             throw new IllegalArgumentException("Room already allocated");
@@ -123,6 +116,14 @@ public void removeStaff(Staff staff) {
         throw new IllegalArgumentException("Room not allocated");
     }
 
+    public List<Room> getAllocatedRooms() {
+        List<Room> allocatedRooms = new ArrayList<>();
+        for (RoomAllocation roomAllocation : this.roomAllocations) {
+            allocatedRooms.add(roomAllocation.getRoom());
+        }
+        return allocatedRooms;
+    }
+
     public RoomAllocation getAllocation(Room room) {
         for (RoomAllocation roomAllocation : this.roomAllocations) {
             if (roomAllocation.getRoom().equals(room)) {
@@ -132,18 +133,16 @@ public void removeStaff(Staff staff) {
         throw new IllegalArgumentException("Room not allocated");
     }
 
+    // ================================================================================================================
     public String createInvoice(RoomAllocation allocation, LocalDate endDate) {
-            String invoice = (allocation.getInvoice(endDate));
-            allocation.getRoom().setAllocation(false);
-            roomAllocations.remove(allocation);
-            this.invoices.add(invoice);
-            return invoice;
+        String invoice = (allocation.getInvoice(endDate));
+        allocation.getRoom().setAllocation(false);
+        roomAllocations.remove(allocation);
+        this.invoices.add(invoice);
+        return invoice;
     }
 
     public List<String> getInvoices() {
         return this.invoices;
     }
-
-
-
 }

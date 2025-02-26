@@ -22,4 +22,9 @@ public class Receptionist extends Staff {
     public String getResponsibilities() {
         return "Responsibilities:\n" + String.join("\n", this.responsibilities);
     }
+
+    @Override
+    public String toString() {
+        return "[Receptionist] " + getName() + " (SSN: " + getSSN() + ")";
+    }
 }
