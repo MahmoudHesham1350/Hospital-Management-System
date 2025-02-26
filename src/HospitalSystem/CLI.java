@@ -597,8 +597,8 @@ public class CLI {
         
         try {
             switch (type) {
-                case "receptionist" -> hospital.addStaff(new Receptionist(ssn, name, contact_info, address, LocalDate.now(), salary, new ArrayList<>())); // null responsibilities
-                case "nurse" -> hospital.addStaff(new Nurse(ssn, name, contact_info, address, LocalDate.now(), salary, "General Nurse")); // null role
+                case "receptionist" -> hospital.addStaff(new Receptionist(ssn, name, contact_info, address, LocalDate.now(), salary, null)); 
+                case "nurse" -> hospital.addStaff(new Nurse(ssn, name, contact_info, address, LocalDate.now(), salary, "General Nurse")); 
                 case "doctor" -> hospital.addStaff(new Doctor(ssn, name, contact_info, address, LocalDate.now(), salary, getDoctorSpecialization(), null));
                 case "management" -> hospital.addStaff(new Management(ssn, name, contact_info, address, LocalDate.now(), salary, getManagementRole(), null));
                 default -> throw new IllegalArgumentException("Invalid Staff Type. Must be Receptionist, Nurse, Doctor, or Management.");
