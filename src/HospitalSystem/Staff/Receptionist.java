@@ -1,6 +1,7 @@
 package HospitalSystem.Staff;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Receptionist extends Staff {
@@ -8,7 +9,7 @@ public class Receptionist extends Staff {
 
     public Receptionist(int ssid, String name, int contactInfo, String address, LocalDate hireDate, int salary, List<String> responsibilities) {
         super(ssid, name, contactInfo, address, hireDate, salary);
-        this.responsibilities = responsibilities;
+        this.responsibilities = responsibilities != null ? responsibilities : new ArrayList<>();
     }
 
     public void addResponsibility(String responsibility) {

@@ -5,29 +5,27 @@ import java.util.List;
 
 public class Doctor extends Staff {
     public enum SPECIALIZATION {
-        CARDIOLOGY,
-        DERMATOLOGY,
-        ENDOCRINOLOGY,
-        GASTROENTEROLOGY,
-        NEUROLOGY,
-        ONCOLOGY,
-        PEDIATRICS,
-        PSYCHIATRY,
-        RADIOLOGY,
-        SURGERY
+        CARDIOLOGIST,
+        DERMATOLOGIST,
+        GYNECOLOGIST,
+        NEUROLOGIST,
+        OPHTHALMOLOGIST,
+        PEDIATRICIAN,
+        PSYCHIATRIST,
+        SURGEON,
+        UROLOGIST
     }
 
-    private final SPECIALIZATION specialization;
+    private SPECIALIZATION specialization;
 
     public Doctor(int ssid, String name, int contactInfo, String address, LocalDate hireDate, int salary, SPECIALIZATION specialization, List<String>[] schedule) {
         super(ssid, name, contactInfo, address, hireDate, salary);
         this.specialization = specialization;
     }
 
-    @Override
-    public void getInfo() {
-        super.getInfo();
-        System.out.println("Specialization: " + specialization);
+    
+    public void setSpecialization(SPECIALIZATION specialization) {
+        this.specialization = specialization;
     }
 
     @Override

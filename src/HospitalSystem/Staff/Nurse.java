@@ -7,7 +7,7 @@ public class Nurse extends Staff {
 
     public Nurse(int ssid, String name, int contactInfo, String address, LocalDate hireDate, int salary, String role) {
         super(ssid, name, contactInfo, address, hireDate, salary);
-        this.role = role;
+        this.role = role != null ? role : "General Nurse";
     }
 
     @Override
